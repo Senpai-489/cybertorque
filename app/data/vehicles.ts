@@ -432,7 +432,7 @@ export const vehicleDetails: Record<
         wheelbase: vehicle.category === "Trucks" ? "3,700 mm" : "2,720 mm",
         length: vehicle.category === "Trucks" ? "5,900 mm" : "4,800 mm",
       },
-      vehicleOutline: "/vehicles/mustang.png",
+      vehicleOutline: "/car-outline.png",
       backgroundImage: "/vehicles/mustang-bg.jpg",
       logo: `/brands/${vehicle.brand}.png`,
       variants: vehicles

@@ -341,6 +341,8 @@ export default function Navbar() {
                 const href =
                   item === "Home"
                     ? "/"
+                    : item === "Our Fleet"
+                      ? "/cars"
                     : `/${item
                         .toLowerCase()
                         .replaceAll(" ", "-")}`;

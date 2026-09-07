@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import Interior360 from "./Interior360";
 import Vehicle360Viewer from "./Vehicle360Viewer";
 import VehicleConfigurationPanel, {
   type VehicleConfiguration,
@@ -57,6 +58,14 @@ export default function VehicleConfigurator({
               fallbackImage={vehicle.image}
               vehicleName={`${vehicle.brand} ${vehicle.name}`}
             />
+
+            <div className="mt-12">
+              
+              <Interior360
+                image="/interior-360.png"
+                className="w-full h-full border border-white/10"
+              />
+            </div>
 
             <div className="mt-12 grid grid-cols-2 gap-px border border-white/10 bg-white/10 sm:grid-cols-4">
               {[

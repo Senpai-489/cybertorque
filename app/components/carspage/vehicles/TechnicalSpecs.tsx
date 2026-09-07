@@ -4,6 +4,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ChevronDown, ArrowUpRight } from "lucide-react";
 import gsap from "gsap";
+import Link from "next/link";
 
 interface SpecItem {
   label: string;
@@ -27,6 +28,8 @@ interface TechnicalSpecsProps {
   dimensions?: VehicleDimensions;
   vehicleOutline?: string;
   buildHref?: string;
+  vehicleSlug?: string;
+  compareVehicles?: { slug: string; brand: string; name: string; variant?: string }[];
 }
 
 const defaultCategories: SpecCategory[] = [
@@ -95,10 +98,13 @@ export default function TechnicalSpecs({
   dimensions = defaultDimensions,
   vehicleOutline = "/car-outline.png",
   buildHref = "#",
+  vehicleSlug,
+  compareVehicles = [],
 }: TechnicalSpecsProps) {
   const sectionRef = useRef<HTMLElement>(null);
 
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [compareOpen, setCompareOpen] = useState(false);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -479,6 +485,8 @@ export default function TechnicalSpecs({
               </a>
 
               <button
+                type="button"
+                onClick={() => setCompareOpen(true)}
                 className="
                   flex
                   h-[46px]
@@ -501,6 +509,47 @@ export default function TechnicalSpecs({
                 Compare
               </button>
             </div>
+
+              {compareOpen && vehicleSlug && (
+                <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/70 px-6 backdrop-blur-sm">
+                  <div className="w-full max-w-lg border border-white/15 bg-[#191919] p-6 text-white md:p-8">
+                    <div className="flex items-start justify-between gap-6 border-b border-white/10 pb-5">
+                      <div>
+                        <p className="font-stint text-[8px] uppercase tracking-[0.2em] text-[#bd9852]">
+                          Select a vehicle
+                        </p>
+                        <h3 className="mt-3 font-stint text-2xl uppercase">
+                          Compare models
+                        </h3>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setCompareOpen(false)}
+                        aria-label="Close vehicle selection"
+                        className="font-stint text-xl text-white/50 hover:text-white"
+                      >
+                        ×
+                      </button>
+                    </div>
+
+                    <div className="mt-5 grid max-h-[55vh] gap-2 overflow-y-auto">
+                      {compareVehicles
+                        .filter((vehicle) => vehicle.slug !== vehicleSlug)
+                        .map((vehicle) => (
+                          <Link
+                            key={vehicle.slug}
+                            href={`/compare?vehicles=${vehicleSlug},${vehicle.slug}`}
+                            onClick={() => setCompareOpen(false)}
+                            className="flex items-center justify-between border border-white/10 px-4 py-4 font-stint text-[10px] uppercase tracking-[0.06em] text-white/70 transition-colors hover:border-[#bd9852] hover:text-[#bd9852]"
+                          >
+                            <span>{vehicle.brand} {vehicle.name}</span>
+                            <span className="text-[8px] text-white/35">{vehicle.variant ?? vehicle.slug}</span>
+                          </Link>
+                        ))}
+                    </div>
+                  </div>
+                </div>
+              )}
           </div>
 
           {/* =================================================

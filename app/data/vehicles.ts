@@ -65,23 +65,7 @@ const vehicleCatalog: VehicleCatalogEntry[] = [
     price: "₹85,00,000",
   },
 
-  {
-    id: 2,
-    slug: "ram-3500",
-    brand: "RAM",
-    name: "RAM 3500",
-    category: "Trucks",
-
-    image: "/vehicles/ram-3500.png",
-
-    horsepower: "420 HP",
-    acceleration: "7.0 sec",
-    engine: "V8",
-    seats: "5",
-
-    price: "₹95,00,000",
-  },
-
+ 
   {
     id: 3,
     slug: "dodge-charger-petrol",

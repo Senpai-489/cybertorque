@@ -26,16 +26,16 @@ const vehicles = [
     slug: "/cars/ram-2500",
   },
 
-  {
-    number: "02",
-    image: "/cars/ram-3500.jpg",
-    category: "Trucks",
-    name: "RAM 3500",
-    year: "2025",
-    mileage: "New",
-    fuel: "Diesel",
-    slug: "/cars/ram-3500",
-  },
+  // {
+  //   number: "02",
+  //   image: "/cars/ram-3500.jpg",
+  //   category: "Trucks",
+  //   name: "RAM 3500",
+  //   year: "2025",
+  //   mileage: "New",
+  //   fuel: "Diesel",
+  //   slug: "/cars/ram-3500",
+  // },
 
   {
     number: "03",
@@ -200,10 +200,10 @@ const vehicles = [
     image: "/cars/tesla-cybertruck.jpg",
     category: "Electric",
     name: "Tesla Cybertruck",
-    year: "TBC",
-    mileage: "TBC",
+    year: "2025",
+    mileage: "New",
     fuel: "EV",
-    status: "TBC",
+    
     slug: "/cars/tesla-cybertruck",
   },
 ];

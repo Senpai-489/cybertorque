@@ -95,23 +95,6 @@ export default function VehicleCard({
             NUMBER
         ================================================== */}
 
-        <span
-          className="
-            absolute
-            left-4
-            top-4
-            z-10
-            font-stint
-            text-[12px]
-            tracking-[0.05em]
-            text-white
-            md:left-5
-            md:top-5
-            md:text-[13px]
-          "
-        >
-          {number}
-        </span>
 
         {/* ==================================================
             IMAGE CORNER

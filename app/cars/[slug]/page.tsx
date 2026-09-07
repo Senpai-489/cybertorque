@@ -62,6 +62,8 @@ export default async function VehiclePage({
        dimensions={details.dimensions}
        vehicleOutline={details.vehicleOutline}
       buildHref={`/configurator/${vehicle.slug}`}
+      vehicleSlug={vehicle.slug}
+      compareVehicles={vehicles}
      />
      <VehicleVariants variants={details.variants} />
      <MoreLikeThis vehicles={relatedVehicles} />

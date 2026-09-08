@@ -59,13 +59,13 @@ export default function VehicleConfigurator({
               vehicleName={`${vehicle.brand} ${vehicle.name}`}
             />
 
-            <div className="mt-12">
-              
+           
+              <div className="mt-12">
               <Interior360
-                image="/interior-360.png"
-                className="w-full h-full border border-white/10"
+                image="/interior-360.jpg"
+                className="aspect-[1.333333] z-50 border border-white/10"
               />
-            </div>
+          </div>
 
             <div className="mt-12 grid grid-cols-2 gap-px border border-white/10 bg-white/10 sm:grid-cols-4">
               {[

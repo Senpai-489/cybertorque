@@ -1,9 +1,8 @@
 "use client";
 
 import { Canvas, useThree } from "@react-three/fiber";
-import { useTexture } from "@react-three/drei";
 import * as THREE from "three";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface Interior360Props {
   image: string;
@@ -22,19 +21,42 @@ export default function Interior360({
         camera={{
           position: [0, 0, 0],
           fov: 75,
-          near: 0.1,
-          far: 100,
+          near: 0.01,
+          far: 1000,
         }}
         gl={{
           antialias: true,
           alpha: false,
+          powerPreference: "high-performance",
         }}
         dpr={[1, 2]}
+        onCreated={({ gl }) => {
+          gl.outputColorSpace = THREE.SRGBColorSpace;
+        }}
       >
         <Panorama image={image} />
       </Canvas>
 
-      {/* UI */}
+      {/* TOP CONTROL */}
+
+      <div
+        className="
+          pointer-events-none
+          absolute
+          top-0
+          left-1/2
+          -translate-x-1/2
+          flex
+          items-center
+          border-x
+          border-white/10
+          bg-[#111111]/80
+          backdrop-blur-sm
+        "
+      >
+        </div>
+
+      {/* BOTTOM CONTROL */}
 
       <div
         className="
@@ -46,17 +68,17 @@ export default function Interior360({
           border
           border-white/15
           bg-black/30
-          px-5
-          py-3
+          px-7
+          py-4
           backdrop-blur-sm
         "
       >
         <span
           className="
             font-stint
-            text-[8px]
+            text-[9px]
             uppercase
-            tracking-[0.2em]
+            tracking-[0.25em]
             text-white/60
           "
         >
@@ -76,9 +98,9 @@ function Panorama({
 }: {
   image: string;
 }) {
-  const texture = useTexture(image);
+  const { scene, camera, gl } = useThree();
 
-  const { camera, gl } = useThree();
+  const [error, setError] = useState(false);
 
   const yaw = useRef(0);
   const pitch = useRef(0);
@@ -86,7 +108,7 @@ function Panorama({
   const targetYaw = useRef(0);
   const targetPitch = useRef(0);
 
-  const isDragging = useRef(false);
+  const dragging = useRef(false);
 
   const startX = useRef(0);
   const startY = useRef(0);
@@ -94,25 +116,87 @@ function Panorama({
   const startYaw = useRef(0);
   const startPitch = useRef(0);
 
-  /*
-   * Prevent Three.js from flipping the panorama.
-   */
+  /* ==========================================================
+     LOAD PANORAMA
+  ========================================================== */
 
-  texture.colorSpace = THREE.SRGBColorSpace;
+  useEffect(() => {
+    let texture: THREE.Texture | null = null;
 
-  /*
-   * ---------------------------------------------------------
-   * DRAG START
-   * ---------------------------------------------------------
-   */
+    const loader = new THREE.TextureLoader();
+
+    loader.load(
+      image,
+
+      (loadedTexture) => {
+        texture = loadedTexture;
+
+        /*
+         * Normal JPG / PNG panorama
+         */
+
+        texture.colorSpace = THREE.SRGBColorSpace;
+
+        /*
+         * IMPORTANT:
+         *
+         * Tell Three.js this is an equirectangular panorama.
+         */
+
+        texture.mapping =
+          THREE.EquirectangularReflectionMapping;
+
+        texture.needsUpdate = true;
+
+        /*
+         * Display panorama as the scene background.
+         */
+
+        scene.background = texture;
+
+        setError(false);
+      },
+
+      undefined,
+
+      (loadError) => {
+        console.error(
+          "[360 PANORAMA] Failed to load image:",
+          image,
+          loadError
+        );
+
+        setError(true);
+      }
+    );
+
+    return () => {
+      if (texture) {
+        texture.dispose();
+      }
+
+      /*
+       * Don't leave the old panorama around.
+       */
+
+      scene.background = null;
+    };
+  }, [image, scene]);
+
+  /* ==========================================================
+     DRAG CONTROLS
+  ========================================================== */
 
   useEffect(() => {
     const canvas = gl.domElement;
 
-    const handlePointerDown = (
+    canvas.style.touchAction = "none";
+    canvas.style.cursor = "grab";
+
+    const onPointerDown = (
       event: PointerEvent
     ) => {
-      isDragging.current = true;
+      dragging.current = true;
 
       startX.current = event.clientX;
       startY.current = event.clientY;
@@ -120,65 +204,63 @@ function Panorama({
       startYaw.current = targetYaw.current;
       startPitch.current = targetPitch.current;
 
-      canvas.setPointerCapture(event.pointerId);
+      canvas.style.cursor = "grabbing";
+
+      try {
+        canvas.setPointerCapture(
+          event.pointerId
+        );
+      } catch {}
     };
 
-    /*
-     * -------------------------------------------------------
-     * DRAG MOVE
-     * -------------------------------------------------------
-     */
-
-    const handlePointerMove = (
+    const onPointerMove = (
       event: PointerEvent
     ) => {
-      if (!isDragging.current) return;
+      if (!dragging.current) return;
 
-      const deltaX =
+      const dx =
         event.clientX - startX.current;
 
-      const deltaY =
+      const dy =
         event.clientY - startY.current;
 
       /*
-       * Horizontal movement
+       * Horizontal
        */
 
       targetYaw.current =
         startYaw.current -
-        deltaX * 0.005;
+        dx * 0.004;
 
       /*
-       * Vertical movement
+       * Vertical
        */
 
       targetPitch.current =
         startPitch.current -
-        deltaY * 0.005;
+        dy * 0.004;
 
       /*
-       * Prevent looking completely upside down.
+       * Limit vertical movement.
        */
 
-      const maxPitch = Math.PI / 2 - 0.05;
+      const maxPitch =
+        THREE.MathUtils.degToRad(85);
 
-      targetPitch.current = THREE.MathUtils.clamp(
-        targetPitch.current,
-        -maxPitch,
-        maxPitch
-      );
+      targetPitch.current =
+        THREE.MathUtils.clamp(
+          targetPitch.current,
+          -maxPitch,
+          maxPitch
+        );
     };
 
-    /*
-     * -------------------------------------------------------
-     * DRAG END
-     * -------------------------------------------------------
-     */
-
-    const handlePointerUp = (
+    const onPointerUp = (
       event: PointerEvent
     ) => {
-      isDragging.current = false;
+      dragging.current = false;
+
+      canvas.style.cursor = "grab";
 
       try {
         canvas.releasePointerCapture(
@@ -189,61 +271,57 @@ function Panorama({
 
     canvas.addEventListener(
       "pointerdown",
-      handlePointerDown
+      onPointerDown
     );
 
     canvas.addEventListener(
       "pointermove",
-      handlePointerMove
+      onPointerMove
     );
 
     canvas.addEventListener(
       "pointerup",
-      handlePointerUp
+      onPointerUp
     );
 
     canvas.addEventListener(
       "pointercancel",
-      handlePointerUp
+      onPointerUp
     );
 
     return () => {
       canvas.removeEventListener(
         "pointerdown",
-        handlePointerDown
+        onPointerDown
       );
 
       canvas.removeEventListener(
         "pointermove",
-        handlePointerMove
+        onPointerMove
       );
 
       canvas.removeEventListener(
         "pointerup",
-        handlePointerUp
+        onPointerUp
       );
 
       canvas.removeEventListener(
         "pointercancel",
-        handlePointerUp
+        onPointerUp
       );
     };
   }, [gl]);
 
-  /*
-   * ---------------------------------------------------------
-   * CAMERA UPDATE
-   * ---------------------------------------------------------
-   */
+  /* ==========================================================
+     CAMERA ROTATION
+  ========================================================== */
 
   useEffect(() => {
-    let frameId: number;
+    camera.rotation.order = "YXZ";
+
+    let animationFrame: number;
 
     const animate = () => {
-      /*
-       * Smooth movement.
-       */
-
       yaw.current = THREE.MathUtils.lerp(
         yaw.current,
         targetYaw.current,
@@ -256,47 +334,31 @@ function Panorama({
         0.12
       );
 
-      /*
-       * Camera rotation.
-       */
-
-      camera.rotation.order = "YXZ";
-
       camera.rotation.y = yaw.current;
-
       camera.rotation.x = pitch.current;
+      camera.rotation.z = 0;
 
-      frameId = requestAnimationFrame(
-        animate
-      );
+      animationFrame =
+        requestAnimationFrame(animate);
     };
 
     animate();
 
     return () => {
-      cancelAnimationFrame(frameId);
+      cancelAnimationFrame(animationFrame);
     };
   }, [camera]);
 
-  /*
-   * ---------------------------------------------------------
-   * PANORAMA SPHERE
-   * ---------------------------------------------------------
-   */
+  /* ==========================================================
+     DEBUG ERROR
+  ========================================================== */
 
-  return (
-    <mesh
-      scale={[-1, 1, 1]}
-      frustumCulled={false}
-    >
-      <sphereGeometry
-        args={[50, 64, 64]}
-      />
+  if (error) {
+    console.error(
+      "[360 PANORAMA] Image could not be loaded:",
+      image
+    );
+  }
 
-      <meshBasicMaterial
-        map={texture}
-        side={THREE.BackSide}
-      />
-    </mesh>
-  );
+  return null;
 }

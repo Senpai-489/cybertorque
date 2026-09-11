@@ -235,7 +235,7 @@ export default function ProcessSection() {
 
           if (lineRef.current) {
             gsap.to(lineRef.current, {
-              height: `${progress * 50}%`,
+              height: `${progress * 100}%`,
               duration: 0.15,
               ease: "none",
               overwrite: true,

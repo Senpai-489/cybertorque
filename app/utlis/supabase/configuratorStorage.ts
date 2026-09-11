@@ -1,7 +1,7 @@
 import { createClient } from "./client";
 
-export const STORAGE_BUCKET = "cybertirque";
-export const FALLBACK_STORAGE_BUCKET = "cybertorque";
+export const STORAGE_BUCKET: string = "cybertirque";
+export const FALLBACK_STORAGE_BUCKET: string = "cybertorque";
 
 export const VEHICLE_STORAGE_FOLDERS: Record<string, string> = {
   "gmc-yukon-denali": "GMC-Yukon-Denali",

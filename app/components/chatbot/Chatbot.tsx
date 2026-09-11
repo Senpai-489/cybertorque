@@ -146,10 +146,9 @@ export default function Chatbot() {
           id: `bot-${Date.now()}`,
           sender: "bot",
           text: "I am having temporary trouble connecting to the network. You can reach our team 24/7 at concierge@cybertorque.com or +91 98765 43210.",
-          text: "I am having temporary trouble connecting to the concierge system. You can reach our team directly at concierge@cybertorque.com or +91 98765 43210.",
-          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
           suggestions: ["Try again", "View Fleet ???"],
-          suggestions: ["Try again", "Browse Fleet"],
+          
         },
       ]);
     } finally {
@@ -187,11 +186,9 @@ export default function Chatbot() {
           {
             id: `booking-success-${Date.now()}`,
             sender: "bot",
-            text: `? Lead successfully logged! Thank you ${bookingName}. Our concierge has received your booking inquiry for ${bookingVehicle || "a consultation"} and will reach out to you at ${bookingPhone}.`,
-            text: `Lead successfully recorded! Thank you ${bookingName}. Our concierge team has received your booking inquiry for ${bookingVehicle || "a consultation"} and will contact you at ${bookingPhone} within 24 hours.`,
+           text: `Lead successfully recorded! Thank you ${bookingName}. Our concierge team has received your booking inquiry for ${bookingVehicle || "a consultation"} and will contact you at ${bookingPhone} within 24 hours.`,
             timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-            suggestions: ["Browse more cars ???", "How does delivery work? ??"],
-            suggestions: ["Browse more cars", "How does delivery work?"],
+             suggestions: ["Browse more cars", "How does delivery work?"],
           },
         ]);
       } else {
@@ -218,7 +215,6 @@ export default function Chatbot() {
         id: `welcome-${Date.now()}`,
         sender: "bot",
         text: "Conversation refreshed. How can Cyber Torque assist you?",
-        text: "Conversation refreshed. How may Cyber Torque assist you?",
         timestamp: "Just now",
         suggestions: [
           "Browse Available Fleet ???",

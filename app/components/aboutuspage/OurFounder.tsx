@@ -503,10 +503,10 @@ export default function OurFounder() {
                   lg:text-[28px]
                 "
               >
-                "The right car doesn't just
+                &ldquo;The right car doesn&apos;t just
                 take you somewhere.
                 It becomes part of who
-                you are."
+                you are.&rdquo;
               </p>
             </div>
 

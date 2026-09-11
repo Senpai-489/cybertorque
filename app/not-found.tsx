@@ -275,8 +275,8 @@ export default function NotFound() {
                 md:text-[12px]
               "
             >
-              Looks like you've taken a road that
-              doesn't exist. Don't worry there's
+              Looks like you&apos;ve taken a road that
+              doesn&apos;t exist. Don&apos;t worry there&apos;s
               always another road worth taking.
             </p>
 

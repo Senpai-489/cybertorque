@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Search, X, ChevronLeft, ArrowUpRight } from "lucide-react";
+import { X, ChevronLeft, ArrowUpRight } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const menuItems = [
@@ -205,7 +205,7 @@ export default function Navbar() {
           ================================================= */}
 
           <Link
-            href="/book-now"
+            href="/contact-us"
             className="
               group
               flex

@@ -77,6 +77,8 @@ const processes = [
 
 export default function ProcessSection() {
   const sectionRef = useRef<HTMLElement>(null);
+  const pinRef = useRef<HTMLDivElement>(null);
+
   const imageRefs = useRef<(HTMLDivElement | null)[]>([]);
   const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
   const lineRef = useRef<HTMLDivElement>(null);
@@ -85,142 +87,245 @@ export default function ProcessSection() {
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
+    const pin = pinRef.current;
 
-    if (!section) return;
+    if (!section || !pin) return;
 
     const ctx = gsap.context(() => {
+      const images = imageRefs.current.filter(
+        (el): el is HTMLDivElement => el !== null
+      );
+
+      const steps = stepRefs.current.filter(
+        (el): el is HTMLDivElement => el !== null
+      );
+
       /*
-      ==================================================
+      ==========================================================
       INITIAL IMAGE STATE
-      ==================================================
+      ==========================================================
       */
 
-      imageRefs.current.forEach((image, index) => {
-        if (!image) return;
-
-        gsap.set(image, {
-          opacity: index === 0 ? 1 : 0,
-          scale: index === 0 ? 1 : 1.08,
-        });
+      gsap.set(images, {
+        opacity: 0,
+        scale: 1.08,
       });
 
+      if (images[0]) {
+        gsap.set(images[0], {
+          opacity: 1,
+          scale: 1,
+        });
+      }
+
       /*
-      ==================================================
-      INITIAL PROCESS STATES
-      ==================================================
+      ==========================================================
+      INITIAL STEP STATE
+      ==========================================================
       */
 
-      stepRefs.current.forEach((step, index) => {
-        if (!step) return;
-
-        gsap.set(step, {
-          opacity: index === 0 ? 1 : 0.35,
-        });
+      gsap.set(steps, {
+        opacity: 0.35,
       });
 
+      if (steps[0]) {
+        gsap.set(steps[0], {
+          opacity: 1,
+        });
+      }
+
       /*
-      ==================================================
+      ==========================================================
+      INITIAL PROGRESS
+      ==========================================================
+      */
+
+      if (lineRef.current) {
+        gsap.set(lineRef.current, {
+          height: "0%",
+        });
+      }
+
+      /*
+      ==========================================================
+      STEP CHANGE FUNCTION
+      ==========================================================
+      */
+
+      let currentStep = 0;
+
+      const changeStep = (index: number) => {
+        if (index === currentStep) return;
+
+        currentStep = index;
+
+        setActiveStep(index);
+
+        /*
+        --------------------------------------------------------
+        STEP OPACITY
+        --------------------------------------------------------
+        */
+
+        steps.forEach((step, stepIndex) => {
+          gsap.to(step, {
+            opacity: stepIndex <= index ? 1 : 0.35,
+            duration: 0.35,
+            ease: "power2.out",
+            overwrite: true,
+          });
+        });
+
+        /*
+        --------------------------------------------------------
+        IMAGE TRANSITION
+        --------------------------------------------------------
+        */
+
+        images.forEach((image, imageIndex) => {
+          if (imageIndex === index) {
+            gsap.to(image, {
+              opacity: 1,
+              scale: 1,
+              duration: 0.75,
+              ease: "power3.out",
+              overwrite: true,
+            });
+          } else {
+            gsap.to(image, {
+              opacity: 0,
+              scale: 1.08,
+              duration: 0.55,
+              ease: "power2.out",
+              overwrite: true,
+            });
+          }
+        });
+      };
+
+      /*
+      ==========================================================
       MAIN SCROLL TRIGGER
-      ==================================================
+      ==========================================================
       */
 
-      ScrollTrigger.create({
+      const trigger = ScrollTrigger.create({
         trigger: section,
 
         start: "top top",
 
         end: "bottom bottom",
 
+        pin: pin,
+
+        pinSpacing: false,
+
+        anticipatePin: 1,
+
+        invalidateOnRefresh: true,
+
         onUpdate: (self) => {
           const progress = self.progress;
 
-          const index = Math.min(
-            processes.length - 1,
-            Math.floor(progress * processes.length)
-          );
-
-          setActiveStep(index);
-
           /*
-          ------------------------------------------
+          ------------------------------------------------------
           PROGRESS LINE
-          ------------------------------------------
+          ------------------------------------------------------
           */
 
           if (lineRef.current) {
             gsap.to(lineRef.current, {
-              height: `${progress * 100}%`,
+              height: `${progress * 50}%`,
               duration: 0.15,
               ease: "none",
               overwrite: true,
             });
           }
 
+      
           /*
-          ------------------------------------------
-          STEP OPACITY
-          ------------------------------------------
+          ------------------------------------------------------
+          CALCULATE ACTIVE STEP
+          ------------------------------------------------------
           */
 
-          stepRefs.current.forEach((step, stepIndex) => {
-            if (!step) return;
+          const index = Math.min(
+            processes.length - 1,
+            Math.floor(progress * processes.length)
+          );
 
-            gsap.to(step, {
-              opacity:
-                stepIndex <= index
-                  ? 1
-                  : 0.35,
+          changeStep(index);
+        },
 
-              duration: 0.25,
+        onEnter: () => {
+          setActiveStep(0);
+          currentStep = 0;
+        },
 
-              ease: "power2.out",
+        onLeaveBack: () => {
+          currentStep = 0;
+          setActiveStep(0);
 
+          images.forEach((image, index) => {
+            gsap.to(image, {
+              opacity: index === 0 ? 1 : 0,
+              scale: index === 0 ? 1 : 1.08,
+              duration: 0.4,
               overwrite: true,
             });
           });
 
-          /*
-          ------------------------------------------
-          IMAGE TRANSITION
-          ------------------------------------------
-          */
-
-          imageRefs.current.forEach((image, imageIndex) => {
-            if (!image) return;
-
-            if (imageIndex === index) {
-              gsap.to(image, {
-                opacity: 1,
-                scale: 1,
-                duration: 0.7,
-                ease: "power3.out",
-                overwrite: true,
-              });
-            } else {
-              gsap.to(image, {
-                opacity: 0,
-                scale: 1.08,
-                duration: 0.5,
-                ease: "power2.out",
-                overwrite: true,
-              });
-            }
+          steps.forEach((step, index) => {
+            gsap.to(step, {
+              opacity: index === 0 ? 1 : 0.35,
+              duration: 0.3,
+              overwrite: true,
+            });
           });
+
+          if (lineRef.current) {
+            gsap.to(lineRef.current, {
+              height: "0%",
+              duration: 0.2,
+              overwrite: true,
+            });
+          }
+        },
+
+        onLeave: () => {
+          currentStep = processes.length - 1;
+          setActiveStep(processes.length - 1);
         },
       });
 
       /*
-      ==================================================
+      ==========================================================
       REFRESH
-      ==================================================
+      ==========================================================
       */
 
-      requestAnimationFrame(() => {
-        ScrollTrigger.refresh();
-      });
+      const refresh = () => {
+        trigger.refresh();
+      };
+
+      requestAnimationFrame(refresh);
+
+      window.addEventListener("load", refresh);
+
+      /*
+      ==========================================================
+      CLEANUP
+      ==========================================================
+      */
+
+      return () => {
+        window.removeEventListener("load", refresh);
+      };
     }, section);
 
-    return () => ctx.revert();
+    return () => {
+      ctx.revert();
+    };
   }, []);
 
   const ActiveIcon = processes[activeStep].icon;
@@ -228,23 +333,20 @@ export default function ProcessSection() {
   return (
     <section
       ref={sectionRef}
-      className="
-        relative
-        bg-[#1d1d1d]
-        text-white
-      "
+      className="relative bg-[#1d1d1d] text-white"
       style={{
         height: `${processes.length * 100}vh`,
       }}
     >
-      {/* ==================================================
-          STICKY VIEWPORT
-      ================================================== */}
+      {/* =====================================================
+          PINNED VIEWPORT
+      ===================================================== */}
 
       <div
+        ref={pinRef}
         className="
-          sticky
-          top-0
+          process-pin
+          relative
           flex
           h-screen
           w-full
@@ -257,7 +359,7 @@ export default function ProcessSection() {
 
         <div className="absolute inset-0 bg-[#1d1d1d]" />
 
-        {/* subtle gradient */}
+        {/* subtle radial glow */}
 
         <div
           className="
@@ -382,7 +484,9 @@ export default function ProcessSection() {
                 </h2>
               </div>
 
-              {/* IMAGE */}
+              {/* ==================================================
+                  IMAGE
+              ================================================== */}
 
               <div
                 className="
@@ -419,8 +523,6 @@ export default function ProcessSection() {
                       sizes="(max-width: 768px) 100vw, 650px"
                     />
 
-                    {/* image overlay */}
-
                     <div className="absolute inset-0 bg-black/10" />
                   </div>
                 ))}
@@ -441,7 +543,9 @@ export default function ProcessSection() {
                 />
               </div>
 
-              {/* ACTIVE DESCRIPTION */}
+              {/* ==================================================
+                  ACTIVE DESCRIPTION
+              ================================================== */}
 
               <div className="mt-5 min-h-[40px] max-w-[600px]">
                 <p
@@ -483,9 +587,9 @@ export default function ProcessSection() {
                   justify-center
                 "
               >
-                {/* ==========================================
+                {/* ==================================================
                     VERTICAL LINE
-                ========================================== */}
+                ================================================== */}
 
                 <div
                   className="
@@ -498,7 +602,9 @@ export default function ProcessSection() {
                   "
                 />
 
-                {/* PROGRESS */}
+                {/* ==================================================
+                    PROGRESS
+                ================================================== */}
 
                 <div
                   ref={lineRef}
@@ -514,9 +620,9 @@ export default function ProcessSection() {
                   }}
                 />
 
-                {/* ==========================================
+                {/* ==================================================
                     STEPS
-                ========================================== */}
+                ================================================== */}
 
                 <div className="relative flex flex-col gap-5">
                   {processes.map((process, index) => {
@@ -539,7 +645,9 @@ export default function ProcessSection() {
                           gap-5
                         "
                       >
-                        {/* ICON */}
+                        {/* ==================================================
+                            ICON
+                        ================================================== */}
 
                         <div
                           className={`
@@ -591,7 +699,9 @@ export default function ProcessSection() {
                           </span>
                         </div>
 
-                        {/* TITLE */}
+                        {/* ==================================================
+                            TITLE
+                        ================================================== */}
 
                         <div className="flex flex-col">
                           <span

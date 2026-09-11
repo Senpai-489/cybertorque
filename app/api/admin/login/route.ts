@@ -1,7 +1,6 @@
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { createClient } from "@/app/utlis/supabase/server";
+import { createAdminClient } from "@/app/utlis/supabase/server";
 import { createSession, sessionCookie } from "@/app/lib/admin-auth";
 
 export const runtime = "nodejs";
@@ -40,8 +39,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const cookieStore = await cookies();
-    const supabase = createClient(cookieStore);
+    const supabase = createAdminClient();
     const { data: profile, error: profileError } = await supabase
       .from("users")
       .select("id, user_name, role, password")
@@ -49,13 +47,13 @@ export async function POST(request: Request) {
       .maybeSingle<UserRecord>();
 
     if (profileError) throw profileError;
-    if (!profile || profile.role !== "admin") {
-      return NextResponse.json({ error: "Invalid admin credentials" }, { status: 401 });
+    if (!profile || !["admin", "employee"].includes(profile.role)) {
+      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
     const passwordMatches = profile.password.startsWith("$2")
       ? await bcrypt.compare(password, profile.password)
-      : password === profile.password;
+      : false;
     if (!passwordMatches) {
       return NextResponse.json({ error: "Invalid admin credentials" }, { status: 401 });
     }

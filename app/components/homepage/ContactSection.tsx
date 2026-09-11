@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { FormEvent, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -379,7 +379,7 @@ export default function ContactSection() {
                   xl:text-[130px]
                 "
               >
-                Let's
+                Let&apos;s
                 <br />
                 Talk
               </h2>
@@ -641,7 +641,7 @@ export default function ContactSection() {
                         text-black/60
                       "
                     >
-                      We'll be in touch shortly.
+                      We&apos;ll be in touch shortly.
                     </p>
                   </div>
                 </div>

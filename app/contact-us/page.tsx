@@ -7,9 +7,6 @@ import {
   ArrowUpRight,
   CalendarDays,
   Clock3,
-  Mail,
-  MapPin,
-  Phone,
 } from "lucide-react";
 import { useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
@@ -273,7 +270,7 @@ export default function ContactPage() {
                 lg:text-[110px]
               "
             >
-              Let's Talk
+              Let&apos;s Talk
               <br />
 
               <span className="text-[#bd9852]">
@@ -295,11 +292,11 @@ export default function ContactPage() {
                 md:text-[12px]
               "
             >
-              Whether you're searching for your
+              Whether you&apos;re searching for your
               next performance machine, building
               something completely bespoke, or
               simply want to talk automobiles —
-              we're here.
+              we&apos;re here.
             </p>
 
             {/* SCROLL */}
@@ -433,9 +430,9 @@ export default function ContactPage() {
                   md:text-[11px]
                 "
               >
-                Tell us about the vehicle you're
+                Tell us about the vehicle you&apos;re
                 looking for, your preferences, or
-                simply what you've been dreaming
+                simply what you&apos;ve been dreaming
                 about.
               </p>
 
@@ -510,7 +507,7 @@ export default function ContactPage() {
 
                 <div>
                   <label className="font-stint text-[9px] uppercase tracking-[0.05em]">
-                    I'm Interested In
+                    I&apos;m Interested In
                   </label>
 
                   <select
@@ -676,7 +673,7 @@ export default function ContactPage() {
               md:text-[80px]
             "
           >
-            Let's Make
+            Let&apos;s Make
             <br />
             It Happen.
           </h2>
@@ -818,87 +815,4 @@ function InfoBlock({
     
     </div>
   );
-}
-
-/* =========================================================
-   CONTACT INFO
-========================================================= */
-
-function ContactInfo({
-  icon,
-  title,
-  value,
-  link,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  value: string;
-  link?: string;
-}) {
-  const content = (
-    <div
-      className="
-        contact-info-item
-        group
-        border-b
-        border-white/15
-        py-8
-
-        sm:px-6
-        sm:first:pl-0
-        sm:nth-child(2):border-l
-        sm:nth-child(3):border-l
-        sm:nth-child(4):border-l
-
-        lg:py-5
-      "
-    >
-      <div
-        className="
-          flex
-          h-10
-          w-10
-          items-center
-          justify-center
-          text-[#bd9852]
-          transition-transform
-          duration-500
-          group-hover:scale-110
-        "
-      >
-        {icon}
-      </div>
-
-      <p
-        className="
-          mt-5
-          font-stint
-          text-[8px]
-          uppercase
-          tracking-[0.08em]
-          text-white/40
-        "
-      >
-        {title}
-      </p>
-
-      <p
-        className="
-          mt-2
-          font-stint
-          text-[11px]
-          text-white/85
-        "
-      >
-        {value}
-      </p>
-    
-    </div>
-  );
-
-  if (link) {
-    return <a href={link}>{content}</a>;
-  }
-
-  return content;
 }

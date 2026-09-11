@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { getAdminSession } from "@/app/lib/admin-auth";
-import { createClient } from "@/app/utlis/supabase/server";
+import { createAdminClient } from "@/app/utlis/supabase/server";
 
 export const runtime = "nodejs";
 
 const editableFields = [
   "slug",
+  "brand",
   "name",
   "model",
   "variant",
@@ -49,13 +49,13 @@ export async function PATCH(
     }
 
     updates.updated_at = new Date().toISOString();
-    const supabase = createClient(await cookies());
+    const supabase = createAdminClient();
     const { data: vehicle, error } = await supabase
       .from("vehicles")
       .update(updates)
       .eq("id", id)
       .select(
-        "id, slug, name, model, variant, category, image, hero_image, horsepower, acceleration, engine, seats, price, year, description, published, brands(name)"
+        "id, slug, brand_id, brands(name), name, model, variant, category, image, hero_image, horsepower, acceleration, engine, seats, price, year, description, published"
       )
       .single();
 

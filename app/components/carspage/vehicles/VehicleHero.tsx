@@ -80,21 +80,6 @@ export default function VehicleHero({
         x: -45,
       });
 
-      gsap.set(".vehicle-label", {
-        opacity: 0,
-        y: 20,
-      });
-
-      gsap.set(".vehicle-title", {
-        opacity: 0,
-        y: 30,
-      });
-
-      gsap.set(".vehicle-description", {
-        opacity: 0,
-        y: 20,
-      });
-
       gsap.set(".vehicle-cta", {
         opacity: 0,
         y: 20,
@@ -160,37 +145,6 @@ export default function VehicleHero({
         )
 
         .to(
-          ".vehicle-label",
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.6,
-          },
-          "-=0.55"
-        )
-
-        .to(
-          ".vehicle-title",
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.8,
-            ease: "power4.out",
-          },
-          "-=0.45"
-        )
-
-        .to(
-          ".vehicle-description",
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.6,
-          },
-          "-=0.45"
-        )
-
-        .to(
           ".vehicle-car-wrap",
           {
             opacity: 1,
@@ -199,7 +153,7 @@ export default function VehicleHero({
             duration: 1.25,
             ease: "power4.out",
           },
-          "-=1"
+          "-=0.6"
         )
 
         .to(
@@ -801,6 +755,7 @@ xl:text-[200px]
 
       <div
         className="
+         vehicle-car-wrap
          flex
          flex-row
          items-center
@@ -836,7 +791,7 @@ xl:text-[200px]
           2xl:w-[63%]
         "
       >
-        <div className=" relative h-full w-full">
+        <div className="vehicle-car-inner relative h-full w-full">
           <Image
             src={vehicleImage}
             alt={`${brand} ${model}`}

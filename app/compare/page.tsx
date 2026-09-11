@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import Footer from "@/app/components/homepage/Footer";
 import Navbar from "@/app/components/homepage/Navbar";
 import { vehicleDetails, vehicles } from "@/app/data/vehicles";
@@ -22,7 +21,7 @@ export default async function ComparePage({
     .filter(Boolean)
     .slice(0, 3);
 
-  const selectedVehicles = selectedSlugs
+  let selectedVehicles = selectedSlugs
     .map((slug) => vehicles.find((vehicle) => vehicle.slug === slug))
     .filter(
       (vehicle): vehicle is (typeof vehicles)[number] =>
@@ -30,7 +29,7 @@ export default async function ComparePage({
     );
 
   if (selectedVehicles.length < 2) {
-    notFound();
+    selectedVehicles = vehicles.slice(0, 2);
   }
 
   const selectedDetails = selectedVehicles.map((vehicle) => ({

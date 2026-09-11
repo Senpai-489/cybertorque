@@ -5,7 +5,6 @@ import Link from "next/link";
 import {
   ArrowUpRight,
   CalendarDays,
-  MapPin,
   Phone,
 } from "lucide-react";
 import { useLayoutEffect, useRef } from "react";
@@ -334,7 +333,7 @@ export default function FinalCTA() {
               md:text-[12px]
             "
           >
-            We don't just sell vehicles.
+            We don&apos;t just sell vehicles.
             <br />
             We create memories that last
             a lifetime.
@@ -462,7 +461,7 @@ export default function FinalCTA() {
                 md:text-[11px]
               "
             >
-              Let's build your next
+              Let&apos;s build your next
               experience together.
             </p>
           </div>

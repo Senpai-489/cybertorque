@@ -31,7 +31,7 @@ const faqs = [
   {
     question: "How long does the entire process take?",
     answer:
-      "The timeline depends on the vehicle, location, availability and required customisation. Once your requirements are confirmed, our team will provide a clear estimated timeline for your specific vehicle.",
+      "The timeline depends on the vehicle, location, availability and required customisation. Typically it takes between 6 to 24 weeks from initial consultation to delivery. Our team will provide a detailed timeline based on your specific requirements.",
   },
   {
     question: "Can I arrange a viewing before purchasing?",

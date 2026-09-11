@@ -52,6 +52,13 @@ export default function FleetHero() {
         x: 100,
         scale: 1.04,
       });
+      if (carRef.current) {
+        gsap.set(carRef.current, {
+          opacity: 0,
+          x: 100,
+          scale: 1.04,
+        });
+      }
 
       gsap.set(bottomLineRef.current, {
         scaleX: 0,
@@ -104,9 +111,10 @@ export default function FleetHero() {
             duration: 0.7,
           },
           "-=0.55"
-        )
+        );
 
-        .to(
+      if (carRef.current) {
+        tl.to(
           carRef.current,
           {
             opacity: 1,
@@ -116,16 +124,17 @@ export default function FleetHero() {
             ease: "power3.out",
           },
           "-=1"
-        )
-
-        .to(
-          bottomLineRef.current,
-          {
-            scaleX: 1,
-            duration: 0.8,
-          },
-          "-=0.6"
         );
+      }
+
+      tl.to(
+        bottomLineRef.current,
+        {
+          scaleX: 1,
+          duration: 0.8,
+        },
+        "-=0.6"
+      );
 
       /*
       =====================================================

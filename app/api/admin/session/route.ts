@@ -5,11 +5,11 @@ export const runtime = "nodejs";
 
 export async function GET() {
   const session = await getAdminSession();
-  const isAdmin = session?.role === "admin";
+  const isStaff = session?.role === "admin" || session?.role === "employee";
 
   return NextResponse.json({
-    authenticated: isAdmin,
-    user: isAdmin
+    authenticated: isStaff,
+    user: isStaff
       ? { id: session.userId, username: session.username, email: null, role: session.role }
       : null,
   });

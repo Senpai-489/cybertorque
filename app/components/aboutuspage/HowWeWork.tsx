@@ -1,8 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { ArrowUpRight } from "lucide-react";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -43,8 +42,6 @@ export default function HowWeWork() {
   const sectionRef = useRef<HTMLElement>(null);
   const stepsRef = useRef<HTMLDivElement>(null);
   const imagesRef = useRef<HTMLDivElement>(null);
-
-  const [activeStep, setActiveStep] = useState(0);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -127,17 +124,6 @@ export default function HowWeWork() {
           scrub: 1,
           pin: true,
           anticipatePin: 1,
-
-          onUpdate: (self) => {
-            const progress = self.progress;
-
-            const index = Math.min(
-              steps.length - 1,
-              Math.floor(progress * steps.length)
-            );
-
-            setActiveStep(index);
-          },
         },
       });
 

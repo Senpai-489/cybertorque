@@ -4,7 +4,10 @@ import { useLayoutEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ChevronDown, ArrowUpRight } from "lucide-react";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Link from "next/link";
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface SpecItem {
   label: string;

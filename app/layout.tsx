@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Stint_Ultra_Expanded } from "next/font/google";
 import "./globals.css";
-import Navbar from "./components/homepage/Navbar";
-import Footer from "./components/homepage/Footer";
+import Chatbot from "./components/chatbot/Chatbot";
 
 const stint = Stint_Ultra_Expanded({
   variable: "--font-stint",
@@ -23,8 +22,12 @@ export default function RootLayout({
   return (
     <html lang="en" className={stint.variable}>
     
-      <body>{children}</body>
      
+     
+      <body>
+        {children}
+        <Chatbot />
+      </body>
     </html>
   );
 }

@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { getAdminSession } from "@/app/lib/admin-auth";
-import { createClient } from "@/app/utlis/supabase/server";
+import { createAdminClient } from "@/app/utlis/supabase/server";
 
 export const runtime = "nodejs";
 
@@ -12,11 +11,11 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const supabase = createClient(await cookies());
+    const supabase = createAdminClient();
     const { data: vehicles, error } = await supabase
       .from("vehicles")
       .select(
-        "id, slug, name, model, variant, category, image, hero_image, horsepower, acceleration, engine, seats, price, year, description, published, brands(name)"
+        "id, slug, brand_id, brands(name), name, model, variant, category, image, hero_image, horsepower, acceleration, engine, seats, price, year, description, published"
       )
       .order("created_at", { ascending: false })
       .limit(200);

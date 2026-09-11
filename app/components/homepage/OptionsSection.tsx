@@ -232,8 +232,9 @@ export default function OptionsSection() {
 
         <OptionCard
           option={options[0]}
-          index={0}
-          cardRefs={cardRefs}
+          onRef={(el) => {
+            cardRefs.current[0] = el;
+          }}
           featured
         />
 
@@ -244,14 +245,16 @@ export default function OptionsSection() {
         <div className="grid grid-cols-1 gap-5">
           <OptionCard
             option={options[1]}
-            index={1}
-            cardRefs={cardRefs}
+            onRef={(el) => {
+              cardRefs.current[1] = el;
+            }}
           />
 
           <OptionCard
             option={options[2]}
-            index={2}
-            cardRefs={cardRefs}
+            onRef={(el) => {
+              cardRefs.current[2] = el;
+            }}
           />
         </div>
       </div>
@@ -262,7 +265,7 @@ export default function OptionsSection() {
 
       <div className="flex justify-center pt-12 md:pt-16">
         <Link
-          href="/customisation"
+          href="/cars"
           className="
             group
             flex
@@ -310,8 +313,7 @@ export default function OptionsSection() {
 
 function OptionCard({
   option,
-  index,
-  cardRefs,
+  onRef,
   featured = false,
 }: {
   option: {
@@ -322,22 +324,13 @@ function OptionCard({
     size: string;
   };
 
-  index: number;
-
-  cardRefs: React.MutableRefObject<
-    (HTMLAnchorElement | null)[]
-  >;
-
+  onRef?: (el: HTMLAnchorElement | null) => void;
   featured?: boolean;
 }) {
   return (
     <Link
-      href={`/customisation/${option.title
-        .toLowerCase()
-        .replaceAll(" ", "-")}`}
-      ref={(el) => {
-        cardRefs.current[index] = el;
-      }}
+      href="/cars"
+      ref={onRef}
       className={`
         group
         relative

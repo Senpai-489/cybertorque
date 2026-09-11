@@ -4,7 +4,6 @@ import {
   Phone,
   Mail,
   MapPin,
-  ArrowUpRight,
 } from "lucide-react";
 import Link from "next/link";
 import { useLayoutEffect, useRef } from "react";
@@ -421,40 +420,5 @@ function FooterLink({
         "
       />
     </Link>
-  );
-}
-
-/* ==========================================================
-   SOCIAL LINK
-========================================================== */
-
-function SocialLink({
-  href,
-  label,
-  children,
-}: {
-  href: string;
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <a
-      href={href}
-      aria-label={label}
-      className="
-        flex
-        h-8
-        w-8
-        items-center
-        justify-center
-        text-[#bd9a56]
-        transition-all
-        duration-300
-        hover:scale-110
-        hover:text-white
-      "
-    >
-      {children}
-    </a>
   );
 }

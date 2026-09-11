@@ -16,7 +16,6 @@ interface VehicleCardProps {
 }
 
 export default function VehicleCard({
-  number = "01",
   image,
   category,
   name,

@@ -11,208 +11,28 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 
 import VehicleCard from "@/app/components/carspage/VehicleCard";
+import { vehicles as catalogVehicles } from "@/app/data/vehicles";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const vehicles = [
-  {
-    number: "01",
-    image: "/cars/ram-2500.jpg",
-    category: "Trucks",
-    name: "RAM 2500",
-    year: "2025",
-    mileage: "New",
-    fuel: "Diesel",
-    slug: "/cars/ram-2500",
-  },
+const vehicles = catalogVehicles.map((v, i) => ({
+  number: String(i + 1).padStart(2, "0"),
+  image: v.image,
+  category: v.category,
+  name: v.name.startsWith(v.brand) ? v.name : `${v.brand} ${v.name}`,
+  year: String(v.year),
+  mileage: "New",
+  fuel: v.engine === "Electric" ? "EV" : v.engine.toLowerCase().includes("diesel") ? "Diesel" : "Petrol",
+  variant: v.variant,
+  slug: `/cars/${v.slug}`,
+}));
 
-  // {
-  //   number: "02",
-  //   image: "/cars/ram-3500.jpg",
-  //   category: "Trucks",
-  //   name: "RAM 3500",
-  //   year: "2025",
-  //   mileage: "New",
-  //   fuel: "Diesel",
-  //   slug: "/cars/ram-3500",
-  // },
-
-  {
-    number: "03",
-    image: "/cars/dodge-charger-petrol.jpg",
-    category: "Sports Cars",
-    name: "Dodge Charger",
-    year: "2025",
-    mileage: "New",
-    fuel: "Petrol",
-    variant: "2 Door",
-    slug: "/cars/dodge-charger-petrol-2-door",
-  },
-
-  {
-    number: "04",
-    image: "/cars/dodge-charger-ev.jpg",
-    category: "Electric",
-    name: "Dodge Charger",
-    year: "2025",
-    mileage: "New",
-    fuel: "EV",
-    variant: "2 Door",
-    slug: "/cars/dodge-charger-ev-2-door",
-  },
-
-  
-  {
-    number: "05",
-    image: "/cars/dodge-durango.jpg",
-    category: "SUVs",
-    name: "Dodge Durango",
-    year: "2025",
-    mileage: "New",
-    fuel: "Petrol",
-    slug: "/cars/dodge-durango",
-  },
-
-  {
-    number: "06",
-    image: "/cars/chevrolet-silverado-2500hd.jpg",
-    category: "Trucks",
-    name: "Chevrolet Silverado 2500 HD",
-    year: "2025",
-    mileage: "New",
-    fuel: "Diesel",
-    slug: "/cars/chevrolet-silverado-2500-hd",
-  },
-
-  {
-    number: "07",
-    image: "/cars/chevrolet-corvette.jpg",
-    category: "Sports Cars",
-    name: "Chevrolet Corvette",
-    year: "2025",
-    mileage: "New",
-    fuel: "Petrol",
-    slug: "/cars/chevrolet-corvette",
-  },
-
-  {
-    number: "08",
-    image: "/cars/ford-mustang.jpg",
-    category: "Sports Cars",
-    name: "Ford Mustang",
-    year: "2025",
-    mileage: "New",
-    fuel: "Petrol",
-    slug: "/cars/ford-mustang",
-  },
-
-  {
-    number: "09",
-    image: "/cars/ford-mustang-mach-e.jpg",
-    category: "Electric",
-    name: "Ford Mustang Mach-E",
-    year: "2025",
-    mileage: "New",
-    fuel: "EV",
-    slug: "/cars/ford-mustang-mach-e",
-  },
-
-  {
-    number: "10",
-    image: "/cars/ford-bronco-raptor.jpg",
-    category: "SUVs",
-    name: "Ford Bronco Raptor",
-    year: "2025",
-    mileage: "New",
-    fuel: "Petrol",
-    slug: "/cars/ford-bronco-raptor",
-  },
-
-  {
-    number: "11",
-    image: "/cars/gmc-yukon-denali.jpg",
-    category: "SUVs",
-    name: "GMC Yukon Denali",
-    year: "2025",
-    mileage: "New",
-    fuel: "Petrol",
-    slug: "/cars/gmc-yukon-denali",
-  },
-
-  {
-    number: "12",
-    image: "/cars/gmc-hummer-ev.jpg",
-    category: "Electric",
-    name: "GMC Hummer EV",
-    year: "2025",
-    mileage: "New",
-    fuel: "EV",
-    variant: "SUV / Pickup",
-    slug: "/cars/gmc-hummer-ev",
-  },
-
-  {
-    number: "13",
-    image: "/cars/cadillac-escalade.jpg",
-    category: "Luxury Cars",
-    name: "Cadillac Escalade",
-    year: "2025",
-    mileage: "New",
-    fuel: "Petrol",
-    slug: "/cars/cadillac-escalade",
-  },
-
-  {
-    number: "14",
-    image: "/cars/cadillac-lyriq.jpg",
-    category: "Electric",
-    name: "Cadillac Lyriq",
-    year: "2025",
-    mileage: "New",
-    fuel: "EV",
-    slug: "/cars/cadillac-lyriq",
-  },
-
-  {
-    number: "15",
-    image: "/cars/cadillac-vistiq.jpg",
-    category: "Electric",
-    name: "Cadillac Vistiq",
-    year: "2025",
-    mileage: "New",
-    fuel: "EV",
-    slug: "/cars/cadillac-vistiq",
-  },
-
-  {
-    number: "16",
-    image: "/cars/lincoln-navigator.jpg",
-    category: "Luxury Cars",
-    name: "Lincoln Navigator",
-    year: "2025",
-    mileage: "New",
-    fuel: "Petrol",
-    slug: "/cars/lincoln-navigator",
-  },
-
-  {
-    number: "17",
-    image: "/cars/tesla-cybertruck.jpg",
-    category: "Electric",
-    name: "Tesla Cybertruck",
-    year: "2025",
-    mileage: "New",
-    fuel: "EV",
-    
-    slug: "/cars/tesla-cybertruck",
-  },
-];
 const filters = [
   "All Vehicles",
   "Sports Cars",
   "SUVs",
   "Trucks",
-  "Luxury Cars",
+  "Luxury SUVs",
   "Electric",
 ];
 

@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Navbar from "./components/homepage/Navbar";
 import Hero from "./components/homepage/HeroSection";
+import Countdown from "./components/homepage/Countdown";
 import AboutSection from "./components/homepage/AboutSection";
 import VehiclesSection from "./components/homepage/VehiclesSection";
 import ProcessSection from "./components/homepage/ProcessSection";
@@ -9,7 +9,6 @@ import PrinciplesSection from "./components/homepage/PrinciplesSection";
 import FAQSection from "./components/homepage/FAQSection";
 import ContactSection from "./components/homepage/ContactSection";
 import Footer from "./components/homepage/Footer";
-import Loading from "./loading";
 
 export default function Home() {
   return (
@@ -17,6 +16,7 @@ export default function Home() {
       
          <Navbar />
           <Hero />
+          {/* <Countdown /> */}
           
             <AboutSection />
             <ProcessSection />

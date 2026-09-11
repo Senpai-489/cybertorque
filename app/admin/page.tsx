@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
+import Image from "next/image";
 import { ArrowUpRight, CarFront, LogOut, Pencil, Save, Users, X } from "lucide-react";
 
 type AdminUser = {
@@ -21,6 +22,7 @@ type SessionUser = {
 type AdminVehicle = {
   id: string | number;
   slug: string;
+  brand?: string;
   name: string;
   model: string | null;
   variant: string | null;
@@ -35,8 +37,20 @@ type AdminVehicle = {
   year: number | null;
   published: boolean;
   description: string | null;
-  brands: { name: string } | { name: string }[] | null;
+  brands?: { name: string } | { name: string }[] | null;
 };
+
+type TrackingRecord = {
+  tracking_id: string;
+  vehicle_id: number;
+  status: string;
+  location: string;
+  estimated_delivery: string | null;
+  notes: string;
+  vehicles?: { name: string; brand: string } | null;
+};
+
+const trackingStatuses = ["Order received", "Preparing vehicle", "In transit", "Ready for collection", "Completed"];
 
 export default function AdminPage() {
   const [sessionUser, setSessionUser] = useState<SessionUser | null>(null);
@@ -50,22 +64,24 @@ export default function AdminPage() {
   const [vehicleDraft, setVehicleDraft] = useState<Partial<AdminVehicle>>({});
   const [savingVehicle, setSavingVehicle] = useState(false);
   const [vehicleError, setVehicleError] = useState("");
+  const [tracking, setTracking] = useState<TrackingRecord[]>([]);
+  const [newUser, setNewUser] = useState({ username: "", password: "", role: "employee" });
+  const [newTracking, setNewTracking] = useState({ tracking_id: "", vehicle_id: "", status: "Order received" });
+  const [staffError, setStaffError] = useState("");
 
   const loadUsers = async () => {
     const [usersResponse, vehiclesResponse] = await Promise.all([
       fetch("/api/admin/users"),
       fetch("/api/admin/vehicles"),
     ]);
-    if (!usersResponse.ok) {
-      setSessionUser(null);
-      return;
-    }
-    const usersData = (await usersResponse.json()) as { users: AdminUser[] };
+    const usersData = usersResponse.ok ? (await usersResponse.json()) as { users: AdminUser[] } : { users: [] };
     const vehiclesData = vehiclesResponse.ok
       ? ((await vehiclesResponse.json()) as { vehicles: AdminVehicle[] })
       : { vehicles: [] };
     setUsers(usersData.users);
     setVehicles(vehiclesData.vehicles);
+    const trackingResponse = await fetch("/api/admin/tracking");
+    if (trackingResponse.ok) setTracking(((await trackingResponse.json()) as { tracking: TrackingRecord[] }).tracking);
   };
 
   useEffect(() => {
@@ -116,6 +132,34 @@ export default function AdminPage() {
     setSessionUser(null);
     setUsers([]);
     setVehicles([]);
+    setTracking([]);
+  };
+
+  const createUser = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setStaffError("");
+    const response = await fetch("/api/admin/users", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(newUser) });
+    const data = (await response.json()) as { error?: string; user?: AdminUser };
+    if (!response.ok || !data.user) { setStaffError(data.error ?? "Unable to create user"); return; }
+    setUsers((current) => [data.user!, ...current]);
+    setNewUser({ username: "", password: "", role: "employee" });
+  };
+
+  const createTracking = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setStaffError("");
+    const response = await fetch("/api/admin/tracking", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(newTracking) });
+    const data = (await response.json()) as { error?: string; tracking?: TrackingRecord };
+    if (!response.ok || !data.tracking) { setStaffError(data.error ?? "Unable to create tracking record"); return; }
+    setTracking((current) => [data.tracking!, ...current]);
+    setNewTracking({ tracking_id: "", vehicle_id: "", status: "Order received" });
+  };
+
+  const updateTracking = async (record: TrackingRecord, field: "status" | "location" | "estimated_delivery" | "notes", value: string) => {
+    const response = await fetch(`/api/admin/tracking/${encodeURIComponent(record.tracking_id)}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...record, [field]: value }) });
+    const data = (await response.json()) as { error?: string; tracking?: TrackingRecord };
+    if (!response.ok || !data.tracking) { setStaffError(data.error ?? "Unable to update tracking record"); return; }
+    setTracking((current) => current.map((item) => item.tracking_id === record.tracking_id ? data.tracking! : item));
   };
 
   const startEditingVehicle = (vehicle: AdminVehicle) => {
@@ -136,6 +180,7 @@ export default function AdminPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           slug: vehicleDraft.slug,
+          brand: vehicleDraft.brand,
           name: vehicleDraft.name,
           model: vehicleDraft.model,
           variant: vehicleDraft.variant,
@@ -279,6 +324,43 @@ export default function AdminPage() {
           </div>
           {users.length === 0 && <p className="px-5 py-8 font-sans text-sm text-white/45 sm:px-6">No users found.</p>}
         </section>
+        {sessionUser.role === "admin" && (
+          <section className="mt-8 border border-white/10 bg-[#111111] p-5 sm:p-6">
+            <h2 className="font-stint text-xl uppercase">Add staff user</h2>
+            <form onSubmit={createUser} className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <input required placeholder="Username" value={newUser.username} onChange={(event) => setNewUser({ ...newUser, username: event.target.value })} className="border border-white/15 bg-transparent px-3 py-3 font-sans text-sm outline-none focus:border-[#bd9852]" />
+              <input required minLength={8} type="password" placeholder="Password (8+ chars)" value={newUser.password} onChange={(event) => setNewUser({ ...newUser, password: event.target.value })} className="border border-white/15 bg-transparent px-3 py-3 font-sans text-sm outline-none focus:border-[#bd9852]" />
+              <select value={newUser.role} onChange={(event) => setNewUser({ ...newUser, role: event.target.value })} className="border border-white/15 bg-[#111111] px-3 py-3 font-sans text-sm outline-none"><option value="employee">Employee</option><option value="admin">Admin</option></select>
+              <button className="bg-[#bd9852] px-4 py-3 font-stint text-[8px] uppercase tracking-[0.14em] text-black">Create user</button>
+            </form>
+          </section>
+        )}
+        <section className="mt-8 border border-white/10 bg-[#111111] p-5 sm:p-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="font-stint text-xl uppercase">Vehicle tracking</h2>
+            <span className="font-stint text-[8px] uppercase tracking-[0.14em] text-white/35">{tracking.length} records</span>
+          </div>
+          {sessionUser.role === "admin" && (
+            <form onSubmit={createTracking} className="mt-5 grid gap-3 sm:grid-cols-4">
+              <input required placeholder="Tracking ID" value={newTracking.tracking_id} onChange={(event) => setNewTracking({ ...newTracking, tracking_id: event.target.value })} className="border border-white/15 bg-transparent px-3 py-3 font-sans text-sm outline-none focus:border-[#bd9852]" />
+              <select required value={newTracking.vehicle_id} onChange={(event) => setNewTracking({ ...newTracking, vehicle_id: event.target.value })} className="border border-white/15 bg-[#111111] px-3 py-3 font-sans text-sm outline-none"><option value="">Select vehicle</option>{vehicles.map((vehicle) => <option key={vehicle.id} value={vehicle.id}>{vehicle.brand ?? ""} {vehicle.name}</option>)}</select>
+              <select value={newTracking.status} onChange={(event) => setNewTracking({ ...newTracking, status: event.target.value })} className="border border-white/15 bg-[#111111] px-3 py-3 font-sans text-sm outline-none">{trackingStatuses.map((status) => <option key={status}>{status}</option>)}</select>
+              <button className="bg-[#bd9852] px-4 py-3 font-stint text-[8px] uppercase tracking-[0.14em] text-black">Create tracking ID</button>
+            </form>
+          )}
+          {staffError && <p className="mt-4 font-sans text-sm text-red-300">{staffError}</p>}
+          <div className="mt-6 grid gap-3">
+            {tracking.map((record) => (
+              <article key={record.tracking_id} className="grid gap-3 border-t border-white/10 py-4 sm:grid-cols-[1fr_1fr_1fr_1fr] sm:items-center">
+                <div><p className="font-stint text-[9px] uppercase text-[#bd9852]">{record.tracking_id}</p><p className="mt-1 font-sans text-sm text-white/70">{record.vehicles ? `${record.vehicles.brand} ${record.vehicles.name}` : "Vehicle"}</p></div>
+                <select value={record.status} onChange={(event) => void updateTracking(record, "status", event.target.value)} className="border border-white/15 bg-[#111111] px-3 py-2 font-sans text-sm outline-none">{trackingStatuses.map((status) => <option key={status}>{status}</option>)}</select>
+                <input value={record.location} placeholder="Location" onChange={(event) => setTracking((current) => current.map((item) => item.tracking_id === record.tracking_id ? { ...item, location: event.target.value } : item))} onBlur={(event) => void updateTracking(record, "location", event.target.value)} className="border border-white/15 bg-transparent px-3 py-2 font-sans text-sm outline-none focus:border-[#bd9852]" />
+                <input type="date" value={record.estimated_delivery ?? ""} onChange={(event) => void updateTracking(record, "estimated_delivery", event.target.value)} className="border border-white/15 bg-transparent px-3 py-2 font-sans text-sm text-white outline-none focus:border-[#bd9852]" />
+              </article>
+            ))}
+          </div>
+          {tracking.length === 0 && <p className="mt-6 font-sans text-sm text-white/45">No tracking records found.</p>}
+        </section>
         <section className="mt-8 border border-white/10 bg-[#111111]">
           <div className="flex items-center justify-between border-b border-white/10 px-5 py-5 sm:px-6">
             <h2 className="font-stint text-xl uppercase">Vehicles</h2>
@@ -289,16 +371,20 @@ export default function AdminPage() {
           {vehicles.length > 0 ? (
             <div className="grid gap-px bg-white/10 sm:grid-cols-2 lg:grid-cols-3">
               {vehicles.map((vehicle) => {
-                const brand = Array.isArray(vehicle.brands)
-                  ? vehicle.brands[0]?.name
-                  : vehicle.brands?.name;
+                const brand =
+                  vehicle.brand ||
+                  (Array.isArray(vehicle.brands)
+                    ? vehicle.brands[0]?.name
+                    : vehicle.brands?.name);
                 return (
                   <article key={vehicle.id} className="bg-[#111111] p-5">
-                    <div className="aspect-[1.45] overflow-hidden bg-[#181818]">
+                    <div className="relative aspect-[1.45] overflow-hidden bg-[#181818]">
                       {vehicle.image ? (
-                        <img
+                        <Image
                           src={vehicle.image}
                           alt={`${brand ?? "Vehicle"} ${vehicle.name}`}
+                          fill
+                          unoptimized
                           className="h-full w-full object-contain"
                         />
                       ) : (
@@ -359,6 +445,7 @@ export default function AdminPage() {
             <form onSubmit={saveVehicle} className="grid gap-5 p-5 sm:grid-cols-2 sm:p-7">
               {([
                 ["name", "Name"], ["slug", "Slug"], ["model", "Model"], ["variant", "Variant"],
+                ["brand", "Brand"], ["name", "Name"], ["slug", "Slug"], ["model", "Model"], ["variant", "Variant"],
                 ["category", "Category"], ["image", "Image URL"], ["hero_image", "Hero image URL"],
                 ["horsepower", "Horsepower"], ["acceleration", "Acceleration"], ["engine", "Engine"],
                 ["seats", "Seats"], ["price", "Price"], ["year", "Year"],
